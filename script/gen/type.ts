@@ -1,3 +1,5 @@
+import { state } from './gen';
+
 enum PrimType {
     int = 'int',
     double = 'double',
@@ -46,7 +48,8 @@ export function calcType(type_str_arr: string[]): ItemType[] {
 
 export function convertPrimType(ori_val, type: PrimType) {
     if (type === PrimType.int || type === PrimType.double) {
-        return ori_val ? Number(ori_val) : 0;
+        const result = Number(ori_val);
+        return result === result ? result : null;
     }
     if (type === PrimType.string) {
         return ori_val ? ori_val + '' : null;
@@ -59,13 +62,18 @@ export function convertType(ori_val, type: ItemType) {
     }
     if ((type as multiType).type === 'multiType') {
         const type_arr = (type as multiType).type_arr;
+        let result;
         for (const type_item of type_arr) {
-            const result = convertType(ori_val, type_item);
-            if (result === result) {
-                return result;
+            result = convertType(ori_val, type_item);
+            if (result !== null) {
+                break;
             }
         }
-        console.error(`cant find convertType for ${ori_val}`);
+        return result;
+    }
+
+    if (isArrayEmpty(ori_val)) {
+        return null;
     }
     const val_arr = splitVal(ori_val);
     return convertArrVal(val_arr as any[], type);
@@ -73,16 +81,13 @@ export function convertType(ori_val, type: ItemType) {
 
 function splitVal(ori_val: string, index: number = 0) {
     /** 第一层 0 就相当于空 */
-    if (Number(ori_val) === 0 && index === 0) {
-        return 0;
+    const split_sign = ['|', ';', ','];
+    if (isCantSplit(ori_val, split_sign)) {
+        return ori_val;
     }
 
-    const split_sign = ['|', ';', ','];
     const val_arr = ori_val.split(split_sign[index]);
     if (val_arr.length === 1) {
-        if (index >= split_sign.length) {
-            return ori_val;
-        }
         return splitVal(ori_val, index + 1);
     }
 
@@ -92,6 +97,26 @@ function splitVal(ori_val: string, index: number = 0) {
     }
     return result;
 }
+
+function isCantSplit(ori_val: string, split_sign: string[]) {
+    for (const item of split_sign) {
+        if (ori_val.indexOf(item) !== -1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function isArrayEmpty(ori_val: string) {
+    if (Number(ori_val) === 0) {
+        return true;
+    }
+    if (!ori_val) {
+        return true;
+    }
+    return false;
+}
+
 function convertArrVal(val: any[], type: ItemType): any[] {
     /** 0 就相当于空 */
     if (Number(val) === 0) {

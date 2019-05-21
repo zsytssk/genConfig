@@ -16,9 +16,15 @@ type XlsxInfo = {
         [key: string]: any;
     };
 };
+export const state = {} as {
+    file_name: string;
+    item_title: string;
+};
 export async function genXlsx(file: string) {
     const result = { data: {}, info: {} } as XlsxInfo;
     const file_name = fileName(file);
+
+    state.file_name = file_name;
     const xlsx_content = nodeXlsx.parse(file);
     const [title, type_str_arr, zh_title, ...data] = xlsx_content[0].data;
     const type_arr = calcType(type_str_arr);
@@ -30,6 +36,8 @@ export async function genXlsx(file: string) {
     for (let i = 0; i < type_arr.length; i++) {
         const item_type = type_arr[i];
         const item_title = title[i];
+        state.item_title = item_title;
+
         if (item_type === undefined) {
             console.error(`${file_name}:>${item_title}:> type === ${item_type}`);
         }
