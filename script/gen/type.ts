@@ -1,16 +1,20 @@
-import { state } from './gen';
-
 enum PrimType {
     int = 'int',
     double = 'double',
     string = 'string',
+    keepOrigin = 'keepOrigin',
 }
 type multiType = {
     type: 'multiType';
     type_arr: PrimType[];
 };
+const split_sign = ['|', ';', ','];
+
 export type ItemType = PrimType | PrimType[] | multiType;
 export function calcItemType(type_str: string): ItemType {
+    if (!type_str) {
+        return;
+    }
     if (PrimType[type_str]) {
         return PrimType[type_str];
     }
@@ -38,6 +42,27 @@ export function calcItemType(type_str: string): ItemType {
     return result;
 }
 
+type ItemInfo = {
+    type: ItemType;
+    val: string;
+};
+export function parseItem(ori_val: string): ItemInfo {
+    if (!ori_val || !ori_val.split) {
+        return;
+    }
+    const type_split_sign = '->';
+    const split = ori_val.split(type_split_sign);
+    if (split.length === 1) {
+        return;
+    }
+    const [val, type_src] = split;
+    const type = calcItemType(type_src);
+    return {
+        type,
+        val,
+    };
+}
+
 export function calcType(type_str_arr: string[]): ItemType[] {
     const result: ItemType[] = [];
     for (const item of type_str_arr) {
@@ -54,15 +79,33 @@ export function convertPrimType(ori_val, type: PrimType) {
     if (type === PrimType.string) {
         return ori_val ? ori_val + '' : null;
     }
+    if (type === PrimType.keepOrigin) {
+        return ori_val;
+    }
 }
 
 export function convertType(ori_val, type: ItemType) {
+    /** item特殊的类型... */
+    const item_info = parseItem(ori_val);
+    if (item_info) {
+        ori_val = item_info.val;
+        type = item_info.type;
+    }
+
     if (typeof type !== 'object') {
         return convertPrimType(ori_val, type);
     }
     if ((type as multiType).type === 'multiType') {
-        const type_arr = (type as multiType).type_arr;
-        let result;
+        let type_arr = (type as multiType).type_arr;
+        let result = null;
+        type_arr = type_arr.sort((a, b) => {
+            if (Array.isArray(a)) {
+                return -1;
+            }
+            if (Array.isArray(b)) {
+                return 1;
+            }
+        });
         for (const type_item of type_arr) {
             result = convertType(ori_val, type_item);
             if (result !== null) {
@@ -72,17 +115,18 @@ export function convertType(ori_val, type: ItemType) {
         return result;
     }
 
-    if (isArrayEmpty(ori_val)) {
-        return null;
+    if (Array.isArray(type)) {
+        if (isArrayEmpty(ori_val) || isCantSplit(ori_val)) {
+            return null;
+        }
+        const val_arr = splitVal(ori_val);
+        return convertArrVal(val_arr as any[], type);
     }
-    const val_arr = splitVal(ori_val);
-    return convertArrVal(val_arr as any[], type);
 }
 
 function splitVal(ori_val: string, index: number = 0) {
     /** 第一层 0 就相当于空 */
-    const split_sign = ['|', ';', ','];
-    if (isCantSplit(ori_val, split_sign)) {
+    if (isCantSplit(ori_val)) {
         return ori_val;
     }
 
@@ -98,7 +142,11 @@ function splitVal(ori_val: string, index: number = 0) {
     return result;
 }
 
-function isCantSplit(ori_val: string, split_sign: string[]) {
+function isCantSplit(ori_val: string) {
+    if (!ori_val.split) {
+        return true;
+    }
+
     for (const item of split_sign) {
         if (ori_val.indexOf(item) !== -1) {
             return false;
