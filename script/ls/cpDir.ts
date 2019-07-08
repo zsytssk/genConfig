@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { exists, lstat, readdir } from './asyncUtil';
+import { exists, lstatFile, readdir } from './asyncUtil';
 import { cpFile } from './cpFile';
 import { isIgnore } from './ignore';
 
@@ -25,7 +25,7 @@ export async function cpDir(
         const abs_src_path = path.resolve(src_folder, file_name);
         const abs_dist_path = path.resolve(dist_folder, file_name);
         let add_num = 0;
-        const stat = await lstat(abs_src_path);
+        const stat = await lstatFile(abs_src_path);
         if (stat.isDirectory()) {
             add_num = await cpDir(abs_src_path, abs_dist_path, progress_fun);
         } else {

@@ -46,22 +46,6 @@ type ItemInfo = {
     type: ItemType;
     val: string;
 };
-export function parseItem(ori_val: string): ItemInfo {
-    if (!ori_val || !ori_val.split) {
-        return;
-    }
-    const type_split_sign = '->';
-    const split = ori_val.split(type_split_sign);
-    if (split.length === 1) {
-        return;
-    }
-    const [val, type_src] = split;
-    const type = calcItemType(type_src);
-    return {
-        type,
-        val,
-    };
-}
 
 export function calcType(type_str_arr: string[]): ItemType[] {
     const result: ItemType[] = [];
@@ -84,14 +68,7 @@ export function convertPrimType(ori_val, type: PrimType) {
     }
 }
 
-export function convertType(ori_val, type: ItemType) {
-    /** item特殊的类型... */
-    const item_info = parseItem(ori_val);
-    if (item_info) {
-        ori_val = item_info.val;
-        type = item_info.type;
-    }
-
+export function convertType(ori_val, type: ItemType, is_top = true) {
     if (typeof type !== 'object') {
         return convertPrimType(ori_val, type);
     }
@@ -107,7 +84,7 @@ export function convertType(ori_val, type: ItemType) {
             }
         });
         for (const type_item of type_arr) {
-            result = convertType(ori_val, type_item);
+            result = convertType(ori_val, type_item, false);
             if (result !== null) {
                 break;
             }
@@ -116,7 +93,16 @@ export function convertType(ori_val, type: ItemType) {
     }
 
     if (Array.isArray(type)) {
-        if (isArrayEmpty(ori_val) || isCantSplit(ori_val)) {
+        if (isArrayEmpty(ori_val)) {
+            return null;
+        }
+        if (isCantSplit(ori_val)) {
+            /** 如果是数组, 而且只有一个类型, 那么直接转化为只有一个元素的数组
+             * 1.5:Array<int> => [1.5]
+             */
+            if (is_top && type.length === 1) {
+                return [convertPrimType(ori_val, type[0])];
+            }
             return null;
         }
         const val_arr = splitVal(ori_val);

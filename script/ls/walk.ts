@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { lstat, readdir } from './asyncUtil';
+import { lstatFile, readdir } from './asyncUtil';
 
 export async function walk(dir) {
     dir = path.normalize(dir);
@@ -9,7 +9,7 @@ export async function walk(dir) {
 
     for (const file of files) {
         const file_path = path.join(dir, file);
-        const stat = await lstat(file_path);
+        const stat = await lstatFile(file_path);
         if (stat.isDirectory()) {
             const sub_files = await walk(file_path);
             file_list = file_list.concat(sub_files);

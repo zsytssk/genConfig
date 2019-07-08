@@ -1,4 +1,4 @@
-import { exists, lstat } from './asyncUtil';
+import { exists, lstatFile } from './asyncUtil';
 import { cpDir } from './cpDir';
 import { cpFile } from './cpFile';
 import { mk } from './mk';
@@ -8,7 +8,7 @@ export async function cp(src_path: string, dist_path: string, progress_fun?) {
     if (!(await exists(src_path))) {
         return;
     }
-    const stat = await lstat(src_path);
+    const stat = await lstatFile(src_path);
     if (stat.isFile()) {
         await cpFile(src_path, dist_path);
     } else if (stat.isDirectory()) {
@@ -23,7 +23,7 @@ export async function mv(src_path: string, dist_path: string) {
     if (!(await exists(dist_path))) {
         await mk(dist_path);
     }
-    const stat = await lstat(src_path);
+    const stat = await lstatFile(src_path);
     let file_num = 1;
     if (stat.isFile()) {
         await cpFile(src_path, dist_path);

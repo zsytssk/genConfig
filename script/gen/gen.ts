@@ -4,6 +4,7 @@ import { write } from '../ls/write';
 import { stringify } from '../utils/util';
 import { calcType, convertType, ItemType, calcItemType } from './type';
 import { parseXlsx } from './xlsxUtil';
+import { getFileInfo } from '../ls/pathUtil';
 
 // import * as xlsx from 'xlsx';
 type XlsxInfo = {
@@ -21,11 +22,21 @@ export const state = {} as {
     item_title: string;
 };
 export async function genXlsx(file: string) {
+    const file_info = await getFileInfo(file);
+    if (file_info.type === 'directory') {
+        return;
+    }
     const result = { data: {}, info: {} } as XlsxInfo;
     const file_name = fileName(file);
 
     state.file_name = file_name;
-    const xlsx_content = parseXlsx(file);
+
+    let xlsx_content;
+    try {
+        xlsx_content = parseXlsx(file);
+    } catch {
+        return;
+    }
     const [title_raw, type_str_arr_raw, zh_title_raw, ...data_raw] = xlsx_content[0];
 
     const title = title_raw.map(item => {
@@ -71,7 +82,6 @@ export async function genXlsx(file: string) {
         for (let k = 0; k < title.length; k++) {
             let item_type = type[k];
             const item_title = title[k];
-            const item = row[k];
             const { v, c } = row[k] || ({} as any);
             if (c) {
                 item_type = calcItemType(c);
