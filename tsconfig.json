@@ -10,7 +10,7 @@
         "skipDefaultLibCheck": true,
         "skipLibCheck": true,
         "sourceMap": true,
-        "target": "esnext",
+        "target": "es6",
         "watch": true
     },
     "include": ["script", "./test"]

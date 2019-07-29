@@ -1,12 +1,11 @@
 import * as path from 'path';
 import { PROJECT_FOLDER } from '../const';
+import { getFileInfo } from '../ls/pathUtil';
 import { write } from '../ls/write';
 import { stringify } from '../utils/util';
-import { calcType, convertType, ItemType, calcItemType } from './type';
+import { calcItemType, calcType, convertType, ItemType } from './type';
 import { parseXlsx } from './xlsxUtil';
-import { getFileInfo } from '../ls/pathUtil';
 
-// import * as xlsx from 'xlsx';
 type XlsxInfo = {
     info: {
         title: string[];
