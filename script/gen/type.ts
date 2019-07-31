@@ -1,3 +1,5 @@
+import { addErr, state } from '../state';
+
 enum PrimType {
     int = 'int',
     double = 'double',
@@ -72,24 +74,28 @@ export function convertType(ori_val, type: ItemType, is_top = true) {
     if (typeof type !== 'object') {
         return convertPrimType(ori_val, type);
     }
+
     if ((type as multiType).type === 'multiType') {
-        let type_arr = (type as multiType).type_arr;
-        let result = null;
-        type_arr = type_arr.sort((a, b) => {
-            if (Array.isArray(a)) {
-                return -1;
-            }
-            if (Array.isArray(b)) {
-                return 1;
-            }
-        });
-        for (const type_item of type_arr) {
-            result = convertType(ori_val, type_item, false);
-            if (result !== null) {
-                break;
-            }
-        }
-        return result;
+        type = PrimType.string;
+        addErr(`${state.file_name}:>${state.item_title}`);
+        return convertPrimType(ori_val, type);
+        // let type_arr = (type as multiType).type_arr;
+        // let result = null;
+        // type_arr = type_arr.sort((a, b) => {
+        //     if (Array.isArray(a)) {
+        //         return -1;
+        //     }
+        //     if (Array.isArray(b)) {
+        //         return 1;
+        //     }
+        // });
+        // for (const type_item of type_arr) {
+        //     result = convertType(ori_val, type_item, false);
+        //     if (result !== null) {
+        //         break;
+        //     }
+        // }
+        // return result;
     }
 
     if (Array.isArray(type)) {

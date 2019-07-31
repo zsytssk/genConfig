@@ -3,6 +3,7 @@ import { DIST, intConfig } from './const';
 import { genXlsx } from './gen/gen';
 import { cp } from './ls/main';
 import { rm } from './ls/rm';
+import { state } from './state';
 import { walkSrc } from './utils/walkSrc';
 
 const type = process.argv.slice(2)[0];
@@ -14,6 +15,7 @@ async function gen() {
     for (const file of files_arr) {
         await genXlsx(file);
     }
+    console.log(state.error_arr);
 }
 
 export async function releaseExtern() {

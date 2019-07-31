@@ -4,8 +4,9 @@
     "description": "",
     "scripts": {
         "gen": "ts-node  --files ./script/main gen",
-        "release": "webpack --mode production",
-        "releaseExtern": "ts-node  --files ./script/main releaseExtern"
+        "publish": "webpack --mode production",
+        "releaseExtern": "ts-node  --files ./script/main releaseExtern",
+        "test": "ts-node  --files ./test/test"
     },
     "author": "",
     "license": "ISC",

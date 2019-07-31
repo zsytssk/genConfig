@@ -7,7 +7,7 @@ module.exports = {
     watch: true,
     output: {
         filename: 'genConfig.js',
-        path: path.normalize('D:\\zsytssk\\job\\legend\\script\\genConfig'),
+        path: path.normalize('Z:\\script\\genConfig'),
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json'],

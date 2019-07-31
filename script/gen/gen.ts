@@ -2,8 +2,9 @@ import * as path from 'path';
 import { PROJECT_FOLDER } from '../const';
 import { getFileInfo } from '../ls/pathUtil';
 import { write } from '../ls/write';
+import { state } from '../state';
 import { stringify } from '../utils/util';
-import { calcItemType, calcType, convertType, ItemType } from './type';
+import { calcType, convertType, ItemType } from './type';
 import { parseXlsx } from './xlsxUtil';
 
 type XlsxInfo = {
@@ -15,10 +16,6 @@ type XlsxInfo = {
     data: {
         [key: string]: any;
     };
-};
-export const state = {} as {
-    file_name: string;
-    item_title: string;
 };
 export async function genXlsx(file: string) {
     const file_info = await getFileInfo(file);
@@ -60,7 +57,6 @@ export async function genXlsx(file: string) {
     for (let len = type.length, i = len - 1; i >= 0; i--) {
         const item_type = type[i];
         const item_title = title[i];
-        state.item_title = item_title;
 
         if (item_type === undefined) {
             if (i === type.length - 1 && !item_title) {
@@ -81,10 +77,12 @@ export async function genXlsx(file: string) {
         for (let k = 0; k < title.length; k++) {
             let item_type = type[k];
             const item_title = title[k];
+            state.item_title = item_title;
             const { v, c } = row[k] || ({} as any);
-            if (c) {
-                item_type = calcItemType(c);
-            }
+            /** 不再读取批注 */
+            // if (c) {
+            //     item_type = calcItemType(c);
+            // }
             item_info[item_title] = convertType(v, item_type);
         }
         if (!is_arr) {
