@@ -13,7 +13,11 @@ async function gen() {
     await rm(DIST);
     const files_arr = await walkSrc();
     for (const file of files_arr) {
-        await genXlsx(file);
+        try {
+            await genXlsx(file);
+        } catch (err) {
+            console.log(`generate config error:>`, state.file_name, state.item_title);
+        }
     }
     console.log(state.error_arr);
 }

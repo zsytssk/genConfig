@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "",
     "scripts": {
-        "gen": "ts-node  --files ./script/main gen",
+        "genConfig": "ts-node  --files ./script/main gen",
         "publish": "webpack --mode production",
         "releaseExtern": "ts-node  --files ./script/main releaseExtern",
         "test": "ts-node  --files ./test/test"

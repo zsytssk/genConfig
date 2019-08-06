@@ -18,6 +18,7 @@ type XlsxInfo = {
     };
 };
 export async function genXlsx(file: string) {
+    console.log(file);
     const file_info = await getFileInfo(file);
     if (file_info.type === 'directory') {
         return;
