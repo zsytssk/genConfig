@@ -10,7 +10,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "file-loader": "^3.0.1",
+        "file-loader": "^6.2.0",
         "lodash": "^4.17.11",
         "xlsx": "^0.14.2"
     },
@@ -18,9 +18,9 @@
         "@types/node": "^10.14.4",
         "ts-node": "^8.1.0",
         "typescript": "^3.4.5",
-        "ts-loader": "^4.3.1",
-        "webpack": "^4.11.1",
-        "webpack-cli": "^3.0.2",
+        "ts-loader": "^9.4.2",
+        "webpack": "^5.75.0",
+        "webpack-cli": "^5.0.1",
         "webpack-dev-server": "^3.1.4",
         "webpack-node-externals": "^1.7.2"
     }
